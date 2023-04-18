@@ -1,5 +1,7 @@
 // Importacion de elementos de Routing
 import { Routes, Route } from "react-router-dom"
+import { useContext } from "react"
+import { UserContext } from "./context/UserProvider"
 
 // Importamos las rutas
 import Login from "./routes/Login"
@@ -9,6 +11,7 @@ import Perfil from "./routes/Perfil"
 import Proveedores from "./routes/Proveedores"
 import Services from "./routes/Services"
 import Expedient from "./routes/Expedient"
+import RegisterUser from "./routes/RegisterUser"
 
 // Importamos los componentes
 import Navbar from "./components/Navbar"
@@ -16,6 +19,15 @@ import RequireAuth from "./components/RequireAuth"
 
 
 const App = () => {
+
+  // Obtenemos el USER del contexto
+  const {user} = useContext(UserContext)
+
+  if (user === false) {
+    return <p>Loading...</p>
+  }
+
+
   return (
     <>
       <h1>Ketzal app</h1>
@@ -31,6 +43,7 @@ const App = () => {
 
         {/* Rutas publicas */}
         <Route path="/login" element={<Login />}> </Route>
+        <Route path="/register_user" element={<RegisterUser />}> </Route>
       </Routes>
     </>
   )

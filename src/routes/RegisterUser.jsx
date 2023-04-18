@@ -1,32 +1,31 @@
-// Importamos el useContext para obtener los Contextos
+import { Alert, Button, Checkbox, Form, Input, message } from 'antd';
 import { useContext, useState } from "react"
-// Importamos los Contextos necesarios
-import { UserContext } from "../context/UserProvider"
+// Importamos el CONTEXT del usuario
+import { UserContext } from '../context/UserProvider';
+import { useNavigate } from 'react-router-dom';
 
-import { Link, useNavigate } from "react-router-dom"
-import { Alert, Button, Checkbox, Form, Input, message } from "antd"
+// Importamos los componentes necesarios
 
-const Login = () => {
+const RegisterUser = () => {
 
-    // Iniciamos los estados
     const [email, setEmail] = useState('admin@stil.com')
     const [password, setPassword] = useState('123123')
+    const [rePassword, setRePassword] = useState('12312')
 
-    // Obtenemos los contextos
-    const { loginUser } = useContext(UserContext)
-
-    // Inicializamos el useNsavigate
     const navigate = useNavigate()
 
-    // handle con Funcion asincrona para hacer LOGIN
+    // Traemos el CONTEXT de registro de usuario
+    const { registerUser } = useContext(UserContext)
+
+    // Funcion asincrona para crear el nuevo usuario
     const handleOnFinishForm = async (e) => {
         // console.log("Procesando form:, ", email, password, rePassword)
         try {
-            await loginUser(email, password)
-            alert('Usuario logeado correctamente')
+            await registerUser(email, password)
+            alert('Usuario agregado correctamente')
             navigate('/')
         } catch (error) {
-            console.log('Error al logear usuario CODIGO: ', error.code)
+            console.log('Error al crear usuario CODIGO: ', error.code)
             alert(error.code)
             
         }
@@ -35,7 +34,7 @@ const Login = () => {
 
     return (
         <>
-            <h1>Login</h1>
+            <h1>Nuevo Usuario</h1>
             <Form
                 name="basic"
                 labelCol={{
@@ -51,6 +50,7 @@ const Login = () => {
                     remember: true,
                     email: email,
                     password: password,
+                    repassword: rePassword,
                 }}
                 onFinish={handleOnFinishForm}
             >
@@ -85,6 +85,20 @@ const Login = () => {
                     />
                 </Form.Item>
 
+                <Form.Item
+                    label="Repite password"
+                    name="repassword"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Por favor ingresa un password!',
+                        },
+                    ]}
+                >
+                    <Input.Password
+                        onChange={(e) => setRePassword(e.target.value)}
+                    />
+                </Form.Item>
 
                 <Form.Item
                     name="remember"
@@ -104,13 +118,12 @@ const Login = () => {
                     }}
                 >
                     <Button type="primary" htmlType="submit">
-                        Ingresar
+                        Registrar
                     </Button>
                 </Form.Item>
             </Form>
-
         </>
     )
 }
 
-export default Login
+export default RegisterUser
