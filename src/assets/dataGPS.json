@@ -1,0 +1,25 @@
+{
+    "places": [
+        {
+            "name": "Rummels Bucht",
+            "position": [
+                39.21521,
+                -121.45846
+            ]
+        },
+        {
+            "name": "Rummels Bitch",
+            "position": [
+                48.21521,
+                -153.45846
+            ]
+        },
+        {
+            "name": "roomies mameis",
+            "position": [
+                39.21521,
+                -127.45846
+            ]
+        }        
+    ]
+}

@@ -23,7 +23,6 @@ const Login = () => {
         // console.log("Procesando form:, ", email, password, rePassword)
         try {
             await loginUser(email, password)
-            alert('Usuario logeado correctamente')
             navigate('/')
         } catch (error) {
             console.log('Error al logear usuario CODIGO: ', error.code)

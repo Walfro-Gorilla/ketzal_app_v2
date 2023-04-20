@@ -10,6 +10,11 @@ import { BrowserRouter } from 'react-router-dom'
 import UserProvider from './context/UserProvider'
 
 
+if ( !navigator.geolocation ) {
+  alert('Tu navegador no tiene opcion de Geolocalizacion')
+  throw new Error('Tu navegador no tiene opcion de Geolocalizacion')
+} 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   // Envolvemos toda la app con el contexto del UserProvider
   <UserProvider >

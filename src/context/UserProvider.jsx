@@ -10,6 +10,11 @@ const UserProvider = (props) => {
 
     // Creamos los states requeridos
     const [user, setUser] = useState(false);
+    
+    const [currentPosition, setCurrentPosition] = useState({
+        lng: 0,
+        lat: 0,
+    })
 
     // Verificamos si el usuario esta actualmente logeado
     useEffect(() => {
@@ -17,7 +22,7 @@ const UserProvider = (props) => {
             if (user) {
                 const { email, photoURL, displayName, uid } = user
                 setUser({ email, photoURL, displayName, uid })
-                console.log(user)
+                // console.log(user)
             } else {
                 setUser(null)
             }
@@ -43,7 +48,10 @@ const UserProvider = (props) => {
     return (
         // Cargamos el Cntexto
         <UserContext.Provider
-            value={{ user, setUser, registerUser, loginUser, signOutUser }}
+            value={{
+                user, setUser, registerUser, loginUser, signOutUser,
+                currentPosition, setCurrentPosition
+            }}
         >
             {props.children}
         </UserContext.Provider>

@@ -1,7 +1,8 @@
 // Importacion de elementos de Routing
 import { Routes, Route } from "react-router-dom"
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { UserContext } from "./context/UserProvider"
+import { Drawer } from "antd"
 
 // Importamos las rutas
 import Login from "./routes/Login"
@@ -15,14 +16,26 @@ import RegisterUser from "./routes/RegisterUser"
 
 // Importamos los componentes
 import Navbar from "./components/Navbar"
-import RequireAuth from "./components/RequireAuth"
+
+// Importamos los iconos
+import { MenuOutlined } from "@ant-design/icons"
+
+// Importamos hoja de estilos CSS
+import "./App.css"
+import MapView from "./components/Maps/MapView"
+import LayoutRequireAuth from "./components/layouts/LayoutRequireAuth"
+import LayoutContainerForm from "./components/layouts/LayoutContainerForm"
+import NotFound from "./routes/NotFound"
 
 
 const App = () => {
 
   // Obtenemos el USER del contexto
-  const {user} = useContext(UserContext)
+  const { user } = useContext(UserContext)
+  // State para abri/cerrar menu lateral
+  const [openMenu, setOpenMenu] = useState(false)
 
+  // LOADING para esperar la respuesta del backend de firebase
   if (user === false) {
     return <p>Loading...</p>
   }
@@ -30,21 +43,65 @@ const App = () => {
 
   return (
     <>
-      <h1>Ketzal app</h1>
-      <Navbar />
+      <div
+        style={{
+          background: 'darkslategrey',
+          height: 60,
+          paddingLeft: 12,
+          paddingTop: 12
+        }}
+        className="menuIcon"
+      >
+        <MenuOutlined
+          style={{
+            color: 'white',
+            fontSize: 15
+          }}
+          onClick={() => {
+            setOpenMenu(true)
+          }}
+        />
+      </div>
+
+      <span className="headerMenu" >
+        <Navbar />
+      </span>
+
+      <Drawer
+        placement="left"
+        open={openMenu}
+        onClose={() => {
+          setOpenMenu(false)
+        }}
+        closable={false}
+        bodyStyle={{ backgroundColor: "darkslategrey" }}
+      >
+        <Navbar isInLine />
+      </Drawer>
+
       <Routes>
+
         {/* Rutas protegidas */}
-        <Route path="/" element={<RequireAuth> <Home /> </RequireAuth>}> </Route>
-        <Route path="/clients" element={<RequireAuth> <Clients /> </RequireAuth>}> </Route>
-        <Route path="/perfil" element={<RequireAuth> <Perfil /> </RequireAuth>}> </Route>
-        <Route path="/proveedores" element={<RequireAuth> <Proveedores /> </RequireAuth>}> </Route>
-        <Route path="/services" element={<RequireAuth> <Services /> </RequireAuth>}> </Route>
-        <Route path="/expedient" element={<RequireAuth> <Expedient /> </RequireAuth>}> </Route>
+        <Route path="/" element={<LayoutRequireAuth />}>
+          <Route index element={<Home />} />
+          <Route path="/clientes" element={<Clients />}> </Route>
+          <Route path="/perfil" element={<Perfil />}> </Route>
+          <Route path="/proveedores" element={<Proveedores />}> </Route>
+          <Route path="/services" element={<Services />}> </Route>
+          <Route path="/expedient" element={<Expedient />}> </Route>
+          <Route path="/map" element={<MapView />}> </Route>
+        </Route>
 
         {/* Rutas publicas */}
-        <Route path="/login" element={<Login />}> </Route>
-        <Route path="/register_user" element={<RegisterUser />}> </Route>
-      </Routes>
+        <Route path="/" element={<LayoutContainerForm />} >
+          <Route path="/login" element={<Login />}> </Route>
+          <Route path="/signup" element={<RegisterUser />}> </Route>
+        </Route>
+
+        {/* 4040 error */}
+        <Route path="*" element={ <NotFound /> } />
+
+      </Routes >
     </>
   )
 }
