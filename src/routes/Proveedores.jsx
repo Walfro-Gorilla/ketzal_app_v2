@@ -1,23 +1,17 @@
 // importamos el componente y estilos de mapas de LeafLEft
 import { useContext, useEffect, useState } from "react"
-import { Link } from "react-router-dom"
 import { UserContext } from "../context/UserProvider"
 import {
     Form, Button, Col,
-    Divider, Input, Modal,
-    Row, Select, Space,
-    message
+    Divider, Input,
+    Row, Select,
+    message,
+    Card
 } from "antd"
 import { useFirestore } from "../hooks/useFirestore"
-import { nanoid } from "nanoid"
 
 // importamos el componente de mapas
 import MapView from "../components/Maps/MapView"
-
-// importamos componentes comunes
-import StripeCheckoutForm from "../common/stripe/StripeCheckout"
-import ButtonLoading from "../common/ButtonLoading"
-import MessageAlert from "../components/MessageAlert"
 
 
 
@@ -39,6 +33,11 @@ const Proveedores = () => {
     // inicializamos los metodos del mesage
     const [messageApi, contextHolder] = message.useMessage()
 
+    // Inicializamos el state con la URL de la api
+    const [url, setUrl] = useState('https://pokeapi.co/api/v2/pokemon')
+    const [pokemonsData, setPokemonsData] = useState([])
+    const [pokeSelected, setPokeSelected] = useState('')
+
 
 
 
@@ -47,10 +46,17 @@ const Proveedores = () => {
         // obtenemos la ubicacion actual y la asignamos al state currentPosition
         navigator.geolocation.getCurrentPosition(
             function (position) {
+                const latRaw = position.coords.latitude.toString()
+                const lngRaw = position.coords.longitude.toString()
+                const latLenght = latRaw.length
+                const lngLenght = lngRaw.length
+
+                const latShort = latRaw.slice(0, latLenght -3)
+                const lngShort = lngRaw.slice(0, lngLenght -3)
                 // si acepta el usuario, actualizamo el estado 'currentPosition'
                 setCurrentPosition({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
+                    lat: latShort,
+                    lng: lngShort
                 })
             },
             function (error) {
@@ -63,12 +69,24 @@ const Proveedores = () => {
         )
         // obtenemos la data de proveedores desde firebase
         getData()
+        // llamamos la funcion de consumo de api en cuanto carge provedores
+        fetchPokemonData();
+        console.log("POKES: ", pokemonsData)
         console.log("GETdAtA")
         console.log(newOriginID)
     }, [])
 
 
-
+    // Funcion para llamar la API 
+    const fetchPokemonData = async () => {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setPokemonsData(data.results);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
 
 
@@ -97,12 +115,21 @@ const Proveedores = () => {
             });
             return
         }
+        // Evaluamos si STATE POKE esta vacio
+        if (pokeSelected === '') {
+            messageApi.open({
+                type: 'warning',
+                content: 'Seleccione un poke.',
+            });
+            return
+        }
 
 
         // evaluamos si el newOriginID esta undefined o esta en modo edicion
         if (newOriginID) {
             // actualizamos los datos
             await updateData(newOriginID, nombreEmpresa, costo)
+            setPokeSelected()
             setCosto('')
             setNombreEmpresa('')
             setNewOriginID()
@@ -110,8 +137,9 @@ const Proveedores = () => {
         }
 
         // Si no, utilizamos la funcion addData p[ara crear uno nuevo
-        await addData(nombreEmpresa, costo, currentPosition)
+        await addData(nombreEmpresa, costo, currentPosition, pokeSelected)
         setNombreEmpresa('')
+        setPokeSelected()
         setCosto('')
 
     }
@@ -132,6 +160,12 @@ const Proveedores = () => {
 
 
 
+    // SetPokemonsData(dataPoke)
+    // // Evaluamos si el dataPoke se carga
+    // cargando ? console.log('Cargando pokes...') : console.log(dataPoke)
+
+
+
     // Evaluamos error y loading antes de mostrar compoente
     if (loading.getData) return <p>Loading Data...</p>
     if (error) return <p>{error}</p>
@@ -140,8 +174,8 @@ const Proveedores = () => {
     return (
         <>
             {contextHolder}
-            <Divider orientation="left">Proveedores</Divider>
-            <Row justify="start">
+            <Divider orientation="left">Registro de Proveedores</Divider>
+            <Row gutter={16} justify="start">
 
                 <Col flex span={10}>
                     <Form
@@ -155,7 +189,7 @@ const Proveedores = () => {
                         onFinish={handleOnFinishForm}
                     >
                         <Row style={{ marginBottom: 20 }}>
-                            <Col span={10} style={{ marginRight: 10 }}>
+                            <Col span={8} style={{ marginRight: 10 }}>
                                 <p>Empresa:</p>
                                 <Input
                                     placeholder="Empresa"
@@ -166,7 +200,21 @@ const Proveedores = () => {
                                 />
                             </Col>
 
-                            <Col span={12}>
+                            <Col span={7}>
+                                <p>Poke</p>
+                                <Select
+                                    style={{ width: 120 }}
+                                    onChange={(value) => setPokeSelected(value)}
+                                    value={pokeSelected}
+
+                                >
+                                    {pokemonsData.map((pokemon, index) => (
+                                        <Select.Option key={index} value={pokemon.name}>{pokemon.name}</Select.Option>
+                                    ))}
+                                </Select>
+                            </Col>
+
+                            <Col span={7}>
                                 <p>Costo</p>
                                 <Select
                                     style={{ width: 120 }}
@@ -179,6 +227,7 @@ const Proveedores = () => {
                                     ]}
                                 />
                             </Col>
+
                         </Row>
 
                         <Row>
@@ -219,37 +268,65 @@ const Proveedores = () => {
                     </Form>
                 </Col>
 
-                <Col span={12}>
-                    {data.map((item) => (
-                        <div key={item.nanoid}>
-                            {/* <p> {item.id} </p> */}
-                            <p> {item.nombre} </p>
-                            <p> {item.costo} </p>
-                            <Button
-                                style={{ backgroundColor: 'orange' }}
-                                type="primary"
-                                loading={loading[item.nanoid]}
-                                onClick={() => handleClickEdit(item)}
-                            >
-                                Edit
-                            </Button>
-                            <Button
-                                type="primary"
-                                loading={loading[item.nanoid]}
-                                danger
-                                onClick={() => handleClickDelete(item.nanoid)}
-                            >
-                                Delete
-                            </Button>
-                        </div>
-                    ))}
-                </Col>
 
-            </Row>
-            <Row>
+                    <Col span={12}>
+                        <Row gutter={16}>
+
+                            {data.map((item) => (
+                                <Col key={item.nanoid} span={8} >
+                                    <Card
+                                        style={{ marginBottom: 20 }}
+                                        title={item.nombre}
+                                        bordered={false}
+                                        hoverable
+                                        extra={
+                                            <Button
+                                                type="primary"
+                                                loading={loading[item.nanoid]}
+                                                danger
+                                                onClick={() => handleClickDelete(item.nanoid)}
+                                            >
+                                                x
+                                            </Button>
+
+                                        }
+                                    // cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                                    >
+                                        <Row>
+                                            <Col span={24}>
+                                                <h4>{item.poke}</h4>
+                                                <p>lat: {item.currentPosition.lat} </p>
+                                                <p>lng: {item.currentPosition.lng} </p>
+
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={24}>
+
+                                                <Button
+                                                    style={{ backgroundColor: 'orange' }}
+                                                    type="primary"
+                                                    loading={loading[item.nanoid]}
+                                                    onClick={() => handleClickEdit(item)}
+                                                >
+                                                    Edit
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </Card>
+                                </Col>
+                            ))}
+                        </Row>
+                    </Col >
+
+            </Row >
+
+            <Divider orientation="left">Mapa de Proveedores</Divider>
+
+            <Row style={{marginLeft:100}}>
                 <Col span={24}>
                     {
-                        currentPosition ? <MapView /> : null
+                        currentPosition ? <MapView currentPosition={currentPosition} data={data} /> : null
                     }
                 </Col>
             </Row>

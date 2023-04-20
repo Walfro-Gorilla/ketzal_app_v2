@@ -14,7 +14,7 @@ export const useFirestore = () => {
 
 
     // CREATE function data a clcProveedores
-    const addData = async (nombreEmpresa, costo, currentPosition) => {
+    const addData = async (nombreEmpresa, costo, currentPosition, pokeSelected) => {
         try {
             setLoading(prev => ({ ...prev, addData: true }));
             const newDoc = {
@@ -24,6 +24,7 @@ export const useFirestore = () => {
                 nombre: nombreEmpresa,
                 costo: costo,
                 currentPosition: currentPosition,
+                poke: pokeSelected,
             }
 
             const docRef = doc(db, "clcProovedores", newDoc.nanoid)
