@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { db, auth } from "../firebase";
+import { db, auth, storage } from "../firebase";
 import { collection, deleteDoc, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore/lite";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 // importamos nanoid
 import { nanoid } from 'nanoid'
@@ -11,23 +12,87 @@ export const useFirestore = () => {
     const [error, setError] = useState()
     const [loading, setLoading] = useState({})
 
+    // Obtenemos la fecha actual corta
+    const fecha = new Date();
+    const fechaCorta = fecha.toLocaleDateString();
 
 
-    // CREATE function data a clcProveedores
-    const addData = async (nombreEmpresa, costo, currentPosition, pokeSelected) => {
+
+
+
+    // UPLOAD files function 
+    const uploadLogo = async (file) => {
+        const storageRef = ref(storage, nanoid(6))
+        await uploadBytes(storageRef, file)
+        const url = await getDownloadURL(storageRef)
+        return url
+    }
+
+
+
+    // CREATE function data USERS
+    const addDataUser = async (email, password) => {
+        try {
+            setLoading(prev => ({ ...prev, addDataUser: true }));
+            const newDoc = {
+                uid: auth.currentUser.uid,
+                nanoid: nanoid(6),
+                dateCreated: fechaCorta,
+                firstName: '',
+                lastName: '',
+                email: email,
+                password: password,
+                cell: '',
+                lastLogin: fechaCorta,
+                userRol: 'ADMIN',
+                status: 'ACTIVE',
+                rate: '',
+                photoURL: '',
+            }
+
+            const docRef = doc(db, "Users", newDoc.nanoid)
+            await setDoc(docRef, newDoc)
+            setData([...data, newDoc])
+
+        } catch (error) {
+            console.log(error)
+            setError(error.message)
+        } finally {
+            setLoading(prev => ({ ...prev, addDataUser: false }));
+        }
+    }
+
+
+
+    // CREATE function data a Suppliers
+    const addData = async (
+        nombreEmpresa, address, email, 
+        telephone, typeSupplier, currentPosition, 
+        status, rate, logoURL,
+    ) => {
         try {
             setLoading(prev => ({ ...prev, addData: true }));
             const newDoc = {
+                pid: nanoid(9),
+                dateCreated: fechaCorta,
                 enable: true,
                 nanoid: nanoid(6),
                 idUser: auth.currentUser.uid,
-                nombre: nombreEmpresa,
-                costo: costo,
+                lastLogin: fechaCorta,
+
+
+                name: nombreEmpresa,
+                address: address,
+                email: email,
+                telephone: telephone,
+                typeSupplier: typeSupplier,
+                status: status,
+                rate : rate,
+                logoURL: logoURL,
                 currentPosition: currentPosition,
-                poke: pokeSelected,
             }
 
-            const docRef = doc(db, "clcProovedores", newDoc.nanoid)
+            const docRef = doc(db, "Suppliers", newDoc.nanoid)
             await setDoc(docRef, newDoc)
             setData([...data, newDoc])
 
@@ -38,14 +103,13 @@ export const useFirestore = () => {
             setLoading(prev => ({ ...prev, addData: false }));
         }
     }
-
     // READ function data de clcProveedores
     const getData = async () => {
         // console.log("Auth: ", auth.currentUser.uid)
         try {
             setLoading(prev => ({ ...prev, getData: true }));
             // creamos la referencia a la colleccion
-            const dataRef = collection(db, "clcProovedores")
+            const dataRef = collection(db, "Suppliers")
             // filtramos la data segun parametros
             const q = query(
                 dataRef,
@@ -63,14 +127,15 @@ export const useFirestore = () => {
             setLoading(prev => ({ ...prev, getData: false }));
         }
     }
-
-    // UPDATE function data to clcProovedores
-    const updateData = async (nanoid, newNombre, newCost) => {
+    // UPDATE function data to clcSuppliers
+    const updateData = async (nanoid, newNombre, email, address, telephone,typeSupplier,status,rate,logoURL) => {
         try {
             setLoading((prev) => ({ ...prev, updateData: true }))
-            const docRef = doc(db, 'clcProovedores', nanoid);
-            await updateDoc(docRef, { nombre: newNombre, costo: newCost })
-            setData(data.map(item => item.nanoid === nanoid ? ({ ...item, nombre: newNombre, costo: newCost }) : item))
+            const docRef = doc(db, 'Suppliers', nanoid);
+            await updateDoc(docRef, { name: newNombre, email: email, address: address, telephone: telephone, typeSupplier: typeSupplier, status: status, rate: rate, logoURL: logoURL })
+
+            setData(data.map(item => item.nanoid === nanoid ? ({ ...item, name: newNombre, email: email, address: address, telephone: telephone, typeSupplier: typeSupplier, status: status, rate: rate, logoURL: logoURL }) : item))
+
         } catch (error) {
             console.log(error)
             setError(error.message)
@@ -78,12 +143,11 @@ export const useFirestore = () => {
             setLoading((prev) => ({ ...prev, updateData: false }))
         }
     }
-
-    // DELETE function data to clcProovedores
+    // DELETE function data to clcSuppliers
     const deleteData = async (nanoid) => {
         try {
             setLoading((prev) => ({ ...prev, [nanoid]: true }));
-            const docRef = doc(db, 'clcProovedores', nanoid);
+            const docRef = doc(db, 'Suppliers', nanoid);
             await deleteDoc(docRef)
             setData(data.filter(item => item.nanoid !== nanoid))
         } catch (error) {
@@ -100,6 +164,8 @@ export const useFirestore = () => {
         getData,
         addData,
         deleteData,
-        updateData
+        updateData,
+        addDataUser,
+        uploadLogo
     };
 };

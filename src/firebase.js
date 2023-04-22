@@ -4,6 +4,8 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from 'firebase/auth'
 // importamos firestore
 import { getFirestore } from "firebase/firestore/lite"
+// importamos STORAGE y metodos
+import { getStorage, ref } from "firebase/storage";
 
 
 const firebaseConfig = {
@@ -19,10 +21,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+// Create a root reference
+const storage = getStorage(app);
 // inicializamos el getAuth
 const auth = getAuth(app)
 // inicializamos firestore
 const db = getFirestore(app)
 
 // exportamos
-export {auth, db}
+export {auth, db, storage}

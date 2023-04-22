@@ -55,7 +55,7 @@ const MapView = (props) => {
     return (
         <>
             <MapContainer
-                style={{ height: "400px", width: "90%" }}
+                style={{ height: "350px", width: "350px" }}
                 center={currentPosition ? currentPosition : null}
                 zoom={11}
                 scrollWheelZoom={false}

@@ -1,5 +1,6 @@
 import { useContext } from "react"
 import { UserContext } from "../context/UserProvider"
+import LayoutStructure from "../components/layouts/LayoutStructre"
 
 const Home = () => {
 
@@ -10,6 +11,7 @@ const Home = () => {
         <>
             <h1>Home</h1>
             <h3>Hola {user.email} </h3>
+            
         </>
     )
 }
