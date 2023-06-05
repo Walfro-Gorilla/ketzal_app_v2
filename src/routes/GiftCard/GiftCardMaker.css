@@ -1,0 +1,66 @@
+.carta-box {
+    perspective: 1000px;
+}
+
+.carta {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.carta.volteada {
+    transform: rotateY(180deg);
+}
+
+.cara {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border: 0px;
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+.cara.frontal {
+    z-index: 2;
+}
+
+.cara.trasera {
+    transform: rotateY(180deg);
+    z-index: 1;
+}
+
+.tarjeta-digital {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+}
+
+.tarjeta-digital.volteada {
+    transform: rotateY(180deg);
+}
+
+.tarjeta-digital .cara {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border: 0px;
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+.tarjeta-digital .cara.frontal {
+    z-index: 2;
+}
+
+.tarjeta-digital .cara.trasera {
+    transform: rotateY(180deg);
+    z-index: 1;
+}

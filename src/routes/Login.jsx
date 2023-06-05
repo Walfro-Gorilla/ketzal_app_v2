@@ -11,8 +11,8 @@ import { Button, Checkbox, Col, Divider, Form, Input, Row, message } from "antd"
 const Login = () => {
 
     // Iniciamos los estados
-    const [email, setEmail] = useState('admin@stil.com')
-    const [password, setPassword] = useState('123123')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
     // Obtenemos los contextos
     const { loginUser } = useContext(UserContext)
@@ -25,7 +25,7 @@ const Login = () => {
         // console.log("Procesando form:, ", email, password, rePassword)
         try {
             await loginUser(email, password)
-            navigate('/')
+            navigate('/giftcard')
         } catch (error) {
             console.log('Error al logear usuario CODIGO: ', error.code)
             alert(error.code)

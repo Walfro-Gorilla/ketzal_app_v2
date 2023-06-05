@@ -9,14 +9,17 @@ import { getStorage, ref } from "firebase/storage";
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCfhuCl28RqE3bSc4xRh4XZGQHBpW0NWss",
-  authDomain: "huitziil-6a3e0.firebaseapp.com",
-  databaseURL: "https://huitziil-6a3e0.firebaseio.com",
-  projectId: "huitziil-6a3e0",
-  storageBucket: "huitziil-6a3e0.appspot.com",
-  messagingSenderId: "120958343360",
-  appId: "1:120958343360:web:68e9d40583e44958de7525",
-  measurementId: "G-N5E56HYM7D"
+  apiKey: "AIzaSyBoUA9UzPaoXTKNXcU4rNsuUybcTRA9MjA",
+  authDomain: "mx-ketzal-app.firebaseapp.com",
+  projectId: "mx-ketzal-app",
+  storageBucket: "mx-ketzal-app.appspot.com",
+  messagingSenderId: "709820211009",
+  appId: "1:709820211009:web:5d6535c44369cc44d64bc0",
+  measurementId: "G-VYS7ZJ7D9D",
+
+  databaseURL: "https://mx-ketzal-app.firebaseio.com",
+
+ 
 };
 
 // Initialize Firebase
@@ -29,4 +32,4 @@ const auth = getAuth(app)
 const db = getFirestore(app)
 
 // exportamos
-export {auth, db, storage}
+export { auth, db, storage }

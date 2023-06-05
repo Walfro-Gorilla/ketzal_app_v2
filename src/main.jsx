@@ -9,6 +9,8 @@ import { BrowserRouter } from 'react-router-dom'
 // Importamos los contextos a utilizar
 import UserProvider from './context/UserProvider'
 import SupplierProvider from './context/SupplierProvider'
+import ClientProvider from './context/ClientsProvider'
+import ServiceProvider from './context/ServicesProvider'
 
 
 if (!navigator.geolocation) {
@@ -17,14 +19,20 @@ if (!navigator.geolocation) {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  // Envolvemos toda la app con el contexto del UserProvider
+  //contexto del UserProvider
   <UserProvider >
-    {/* Envolvemos toda la app con el contexto SupplierProvider */}
+    {/* contexto SupplierProvider */}
     <SupplierProvider>
-      {/* Envolvemos la <App /> en el Browser Router para crear la navegacion de la web */}
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      {/* contexto ClientProvider */}
+      <ClientProvider>
+        {/*  context ServicesProvider */}
+        <ServiceProvider>
+          {/* Envolvemos la <App /> en el Browser Router para crear la navegacion de la web */}
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ServiceProvider>
+      </ClientProvider>
     </SupplierProvider>
   </UserProvider>
 )

@@ -1,175 +1,115 @@
 // importamos el componente y estilos de mapas de LeafLEft
 import { useContext, useEffect, useState } from "react"
-import { UserContext } from "../context/UserProvider"
 import {
     Form, Button, Col,
     Divider, Input,
     Row, Select,
     message,
-    Card,
     Modal,
     Space,
     Rate,
-    Image,
-    Popconfirm
+    Popconfirm,
+    DatePicker
 } from "antd"
+
 import { useFirestore } from "../hooks/useFirestore"
 
 // importamos el componente de mapas
-import MapView from "../components/Maps/MapView"
-import TableDynamic from "../components/TableDynamic"
-import ModalDynamic from "../components/ModalDynamic"
-import UploadLogo from "../components/UploadLogo"
+import TableDynamicClients from "../components/Tables/TableDynamicClients"
 
-import { SupplierContext } from "../context/SupplierProvider"
+// importamos el contexto de los CLIENTES
+import { ClientContext } from "../context/ClientsProvider"
 
 
 
 const Clientes = () => {
 
-    // inicializamos el estado de la localizacion actual del usuario
-    const { currentPosition, setCurrentPosition } = useContext(UserContext)
+    // inicializamos el state de 'ClientContex'
+    const {
+        firstName, setFirstName,
+        lastName, setLastName,
+        email, setEmail,
+        telephone, setTelephone,
+        password, setPassword,
+        birthdate, setBirthdate,
+        status, setStatus,
+        rate, setRate,
+        photoURL, setPhotoURL,
+        wishList, setWishList,
+        comments, setComments,
+        type, setType
+    } = useContext(ClientContext)
 
-    // inicializamos el state de ProviderContext
-    const { logoURL, setLogoURL } = useContext(SupplierContext)
-
-    // iniciamos el estado del component
-    const [email, setEmail] = useState('')
-    const [telephone, setTelephone] = useState('')
-    const [typeSupplier, setTypeSupplier] = useState('')
-    const [status, setStatus] = useState('')
-    const [rate, setRate] = useState('')
-    const [nombreEmpresa, setNombreEmpresa] = useState('')
-    const [address, setAddress] = useState('')
-
+    // inicializamos states para editar y abrir modal
     const [newOriginID, setNewOriginID] = useState()
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     //  inicializamos metodos de firestore con useFirestore
     const {
-        data, error, loading, getData, addData, deleteData, updateData
+        error, loading, deleteData,
+        dataClients, getDataClient,
+        addDataClient, updateDataClient,
+        deleteDataClient,
     } = useFirestore()
 
     // inicializamos los metodos del mesage
     const [messageApi, contextHolder] = message.useMessage()
 
-    // Inicializamos el state con la URL de la api
-    const [url, setUrl] = useState('https://pokeapi.co/api/v2/pokemon')
-    const [pokemonsData, setPokemonsData] = useState([])
-    const [pokeSelected, setPokeSelected] = useState('')
-
-
 
 
     // USEEFFECT al cargar el coponente 
     useEffect(() => {
-        // obtenemos la ubicacion actual y la asignamos al state currentPosition
-        navigator.geolocation.getCurrentPosition(
-            function (position) {
-                const latRaw = position.coords.latitude.toString()
-                const lngRaw = position.coords.longitude.toString()
-                const latLenght = latRaw.length
-                const lngLenght = lngRaw.length
-
-                const latShort = latRaw.slice(0, latLenght - 3)
-                const lngShort = lngRaw.slice(0, lngLenght - 3)
-                // si acepta el usuario, actualizamo el estado 'currentPosition'
-                setCurrentPosition({
-                    lat: latShort,
-                    lng: lngShort
-                })
-            },
-            function (error) {
-                console.log(error)
-            },
-            {
-                // activamos high accuarcy para dispositivos con GPS
-                enableHighAccuracy: true
-            }
-        )
-        // obtenemos la data de proveedores desde firebase
-        getData()
-        // llamamos la funcion de consumo de api en cuanto carge provedores
-        // fetchPokemonData();
-        // console.log("POKES: ", pokemonsData)
-        // console.log(newOriginID)
-        console.log("GETdAtA")
-        console.log("DATA: ", data)
+        // obtenemos la dataClients de clientes desde firebase
+        getDataClient()
+        console.log("DATaClients: ", dataClients)
     }, [])
 
 
-    // Funcion para llamar la API 
-    const fetchPokemonData = async () => {
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            setPokemonsData(data.results);
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
 
-
-    // handle para actualizar el state del TYPE supplier
+    // handle para actualizar el state del TYPE lead
     const handleChangeType = (value) => {
-        setTypeSupplier(value)
+        setType(value)
     };
-    // handle para actualizar el state del STATUS del supplier
+    // handle para actualizar el state del STATUS del lead
     const handleChangeStatus = (value) => {
         setStatus(value)
     }
-
     // HANDLE para actualizar state de RATE 
     const handleChangeRate = (value) => {
         setRate(value)
     }
 
 
+
     // handle SUBMIT form
     const handleOnFinishForm = async () => {
 
-        // Evaluamos si STATE nombreEmpresa esta vacio
-        if (nombreEmpresa === '') {
+        // Evaluamos si STATE firstName esta vacio
+        if (firstName === '') {
             messageApi.open({
                 type: 'warning',
-                content: 'Ingresa el nombre del negocio.',
-            });
-            return
-        }
-        // Evaluamos si STATE direccion esta vacio
-        if (address === '') {
-            messageApi.open({
-                type: 'warning',
-                content: 'Escriba la direccion.',
-            });
-            return
-        }
-        // Evaluamos si STATE email esta vacio
-        if (email === '') {
-            messageApi.open({
-                type: 'warning',
-                content: 'Seleccione un email.',
-            });
-            return
-        }
-        // Evaluamos si STATE telefono esta vacio
-        if (telephone === '') {
-            messageApi.open({
-                type: 'warning',
-                content: 'Escriba el telefono',
+                content: 'Ingresa el nombre del LEAD.',
             });
             return
         }
         // Evaluamos si STATE type esta vacio
-        if (typeSupplier === '') {
+        if (type === '') {
             messageApi.open({
                 type: 'warning',
                 content: 'Seleccione el tipo.',
             });
             return
         }
-        // Evaluamos si STATE email esta vacio
+        // Evaluamos si STATE telephone esta vacio
+        if (telephone === '') {
+            messageApi.open({
+                type: 'warning',
+                content: 'Escriba el telefono.',
+            });
+            return
+        }
+        // Evaluamos si STATE status esta vacio
         if (status === '') {
             messageApi.open({
                 type: 'warning',
@@ -177,52 +117,65 @@ const Clientes = () => {
             });
             return
         }
-        // Evaluamos si STATE email esta vacio
-        if (rate === '') {
+        // Evaluamos si STATE rate esta vacio
+        if (rate === null) {
             messageApi.open({
                 type: 'warning',
                 content: 'Seleccione el rate.',
             });
             return
         }
-        // Evaluamos si STATE email esta vacio
-        if (logoURL === '') {
-            messageApi.open({
-                type: 'warning',
-                content: 'Suba el logo.',
-            });
-            return
-        }
 
 
-        // evaluamos si el newOriginID esta undefined o esta en modo edicion
+        // MODO EDIT : si el newOriginID esta undefined o esta en modo edicion
         if (newOriginID) {
             // actualizamos los datos
-            await updateData(newOriginID, nombreEmpresa, email, address, telephone, typeSupplier, status, rate, logoURL)
+            await updateDataClient(
+                newOriginID,
+
+                firstName, lastName, email,
+                telephone, password, birthdate,
+                status, rate, photoURL,
+                wishList, comments, type,
+            )
+            // Reseteamos los states implicados
+            // CERRAMOS el modal
+            setIsModalOpen(false);
+            setFirstName('')
+            setLastName('')
             setEmail('')
-            setNombreEmpresa('')
-            setNewOriginID()
-            setAddress('')
             setTelephone('')
-            setTypeSupplier('')
+            setPassword('')
+            setBirthdate('')
             setStatus('')
             setRate(null)
-            setLogoURL('')
-            handleOk()
+            setPhotoURL('')
+            setWishList('')
+            setComments('')
+            setType('')
 
             // msj success
             messageApi.open({
                 type: 'success',
-                content: 'Supplier updated.',
+                content: 'LEAD  updated.',
             });
             return
         }
 
-        // Si no, utilizamos la funcion addData para CREATE uno nuevo
-        await addData(
-            nombreEmpresa, address, email,
-            telephone, typeSupplier, currentPosition,
-            status, rate, logoURL
+        // MODO CREATE: utilizamos la funcion addData para CREATE uno nuevo
+        await addDataClient(
+            firstName,
+            lastName,
+            email,
+            telephone,
+            password,
+            birthdate,
+            status,
+            rate,
+            photoURL,
+            wishList,
+            comments,
+            type,
         )
 
         // CERRAMOS el modal
@@ -231,44 +184,48 @@ const Clientes = () => {
         // msj success
         messageApi.open({
             type: 'success',
-            content: 'Supplier created.',
+            content: 'LEAD created.',
         });
+
         // Reseteamos los states implicados
-        setNombreEmpresa('')
-        setAddress('')
+        setFirstName('')
+        setLastName('')
         setEmail('')
         setTelephone('')
-        setTypeSupplier('')
+        setPassword('')
+        setBirthdate('')
         setStatus('')
         setRate(null)
-        setLogoURL('')
+        setPhotoURL('')
+        setWishList('')
+        setComments('')
+        setType('')
 
     }
 
+    
+
     // handle DELETE proveedor
-    const handleClickDelete = async (nanoid) => {
-        await deleteData(nanoid);
+    const handleClickDelete = async (key) => {
+        await deleteDataClient(key);
         messageApi.open({
             type: 'warning',
-            content: 'Supplier ELIMINADO.',
+            content: 'Cliente ELIMINADO.',
         });
         console.log("Eliminado");
     }
 
     // handle EDIT proovedor
     const handleClickEdit = async (item) => {
-        setNombreEmpresa(item.name)
+        setFirstName(item.firstName)
+        setLastName(item.lastName)
         setEmail(item.email)
-
-        setAddress(item.address)
         setTelephone(item.telephone)
-        setTypeSupplier(item.typeSupplier)
+        setType(item.type)
         setStatus(item.status)
         setRate(item.rate)
-        setLogoURL(item.logoURL)
-
-
-        setNewOriginID(item.nanoid)
+        setPhotoURL(item.photoURL)
+        setNewOriginID(item.key)
 
         console.log("EDITANDO ando...", item)
         showModal()
@@ -276,29 +233,42 @@ const Clientes = () => {
 
 
 
-    // Handle para el modal de add supplier
+    // Handle para el modal de add lead
     const showModal = () => {
         setIsModalOpen(true);
-
     };
     const handleOk = () => {
         setIsModalOpen(false);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
+
+        // Reseteamos los states implicados
+        setFirstName('')
+        setLastName('')
         setEmail('')
-        setNombreEmpresa('')
-        setNewOriginID()
-        setAddress('')
         setTelephone('')
-        setTypeSupplier('')
+        setPassword('')
+        setBirthdate('')
         setStatus('')
         setRate(null)
-        setLogoURL('')
+        setPhotoURL('')
+        setWishList('')
+        setComments('')
+        setType('')
+        setNewOriginID('')
+
+    };
+
+    // HANDLE dataPicker
+    const onChangeCumple = (date, dateString) => {
+        // seteamos el state de cumpleanos
+        console.log(dateString);
+        // setBirthdate(dateString)
     };
 
     // Evaluamos error y loading antes de mostrar compoente
-    if (loading.getData) return <p>Loading Data...</p>
+    if (loading.getDataClient) return <p>Loading Data...</p>
     if (error) return <p>{error}</p>
 
 
@@ -313,66 +283,15 @@ const Clientes = () => {
                 + LEAD
             </Button>
             <Divider />
-            <TableDynamic data={data ? data : null} handleClickDelete={handleClickDelete} handleClickEdit={handleClickEdit} />
+            <TableDynamicClients data={dataClients ? dataClients : null} handleClickDelete={handleClickDelete} handleClickEdit={handleClickEdit} />
 
-            {/* <Col flex xs={22} >
-                <Row gutter={16}>
-                    {data ? (data.map((item) => (
-                        <Col key={item.nanoid} span={8} >
-                            <Card
-                                style={{ marginBottom: 20 }}
-                                title={item.nombre}
-                                bordered={false}
-                                hoverable
-                                extra={
-                                    <Button
-                                        type="primary"
-                                        loading={loading[item.nanoid]}
-                                        danger
-                                        onClick={() => handleClickDelete(item.nanoid)}
-                                    >
-                                        x
-                                    </Button>
 
-                                }
-                            // cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
-                            >
-                                <Row>
-                                    <Col span={24}>
-                                        <h4>{item.nombreEmpresa}</h4>
-                                        <p>lat: {item.currentPosition.lat} </p>
-                                        <p>lng: {item.currentPosition.lng} </p>
-
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col span={24}>
-
-                                        <Button
-                                            style={{ backgroundColor: 'orange' }}
-                                            type="primary"
-                                            loading={loading[item.nanoid]}
-                                            onClick={() => handleClickEdit(item)}
-                                        >
-                                            Edit
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </Col>
-                    ))) : (
-                        <p>Loading suppliers..</p>
-                    )
-                    }
-                </Row>
-            </Col > */}
 
 
 
             <Modal
-                title={newOriginID ? "Edit Supplier" : "Add Supplier"}
+                title={newOriginID ? "✏️Editar LEAD" : "➕ Agregar LEAD"}
                 open={isModalOpen}
-                onOk={handleOnFinishForm}
                 onCancel={handleCancel}
                 width={1000}
                 centered
@@ -380,8 +299,8 @@ const Clientes = () => {
                     newOriginID ?
                         (
                             <Popconfirm
-                                title="Actualizar Supplier"
-                                description="Estas seguro que quieres actualizar este supplier?"
+                                title="Actualizar LEAD"
+                                description="¿Estas seguro que quieres actualizar a este LEAD?"
                                 onConfirm={handleOnFinishForm}
                                 // onCancel={cancel}
                                 okText="Yes"
@@ -390,9 +309,9 @@ const Clientes = () => {
                                 <Button
                                     style={{ backgroundColor: 'coral' }}
                                     type="primary"
-                                    loading={loading.updateData}
+                                    loading={loading.updateDataClient}
                                 >
-                                    {loading.updateData ? 'Loading...' : 'Actualizar'}
+                                    {loading.updateDataClient ? 'Loading...' : 'Actualizar'}
                                 </Button>
                             </Popconfirm>
 
@@ -401,113 +320,98 @@ const Clientes = () => {
                                 style={{ backgroundColor: 'yellowgreen' }}
                                 type="primary"
                                 onClick={handleOnFinishForm}
-                                loading={loading.addData}
+                                loading={loading.addDataClient}
                             >
-                                {loading.addData ? 'Loading...' : 'Registrar'}
+                                {loading.addDataClient ? 'Loading...' : 'Registrar'}
                             </Button>
-
                         )
-
                 }
             >
 
-
                 <Divider />
+
                 <Row gutter={6} justify="start">
                     <Col flex xs={24} >
                         <Form
                             name="basic"
-
                             style={{
                                 maxWidth: "100%",
                                 marginLeft: 15
                             }}
                             onFinish={handleOnFinishForm}
                         >
+
                             {/* 1st ROW */}
                             <Row style={{ marginBottom: 20 }}>
+
                                 <Col span={8} style={{ marginRight: 10 }}>
-                                    <p>Nombre:</p>
+                                    <p>Nombre(s):</p>
                                     <Input
-                                        placeholder="Nombre Proveedor"
+                                        placeholder="Nombre(s) del LEAD"
                                         // style={{ width: 450 }}
-                                        value={nombreEmpresa}
-                                        onChange={(e) => setNombreEmpresa(e.target.value)}
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
                                     />
                                 </Col>
 
-                                <Col span={8}>
-                                    <p>Direccion</p>
+                                <Col span={8} style={{ marginRight: 10 }}>
+                                    <p>Apellido(s):</p>
                                     <Input
-                                        placeholder="Direccion"
+                                        placeholder="Apellido(s) del LEAD"
                                         // style={{ width: 450 }}
-                                        value={address}
-                                        onChange={(e) => setAddress(e.target.value)}
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
                                     />
                                 </Col>
 
                                 <Col span={7}>
-                                    <p>GPS</p>
-
-                                    <Space>
-                                        <p>LONG: {currentPosition.lng}</p>
-                                        <p>LAT: {currentPosition.lat}</p>
-                                    </Space>
-                                    {/* <Button type="primary" style={{ backgroundColor: "violet" }}>MAP</Button> */}
-
+                                    <p>Tipo</p>
+                                    <Select
+                                        style={{ width: '80%', }}
+                                        onChange={handleChangeType}
+                                        value={type}
+                                        options={[
+                                            { value: 'estudiante', label: 'Estudiante' },
+                                            { value: 'familiar', label: 'Familiar' },
+                                            { value: 'parejas', label: 'Parejas' },
+                                            { value: 'amigos', label: 'Amigos' },
+                                            { value: 'conciertos', label: 'Conciertos' },
+                                        ]}
+                                    />
                                 </Col>
-
-
 
                             </Row>
 
-                            {/* 1.1 ROW hidden */}
-                            <Row hidden >
-                                <Col span={24}>
-                                    {
-                                        currentPosition ? <MapView currentPosition={currentPosition} data={data} /> : null
-                                    }
-                                </Col>
-                            </Row>
 
                             {/* 2nd ROW */}
                             <Row style={{ marginBottom: 20 }}>
                                 <Col span={7} style={{ marginRight: 10 }}>
-                                    <p>Email:</p>
+                                    <p>Telefono:</p>
                                     <Input
-                                        placeholder="Email Supplier"
-                                        // style={{ width: 450 }}
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </Col>
-
-                                <Col span={7}>
-                                    <p>Telefono</p>
-                                    <Input
-                                        placeholder="Telefono oficina"
+                                        placeholder="Whatsapp o Cel"
                                         // style={{ width: 450 }}
                                         value={telephone}
                                         onChange={(e) => setTelephone(e.target.value)}
                                     />
                                 </Col>
 
+                                <Col span={7}>
+                                    <p>Email</p>
+                                    <Input
+                                        placeholder="Email personal"
+                                        // style={{ width: 450 }}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                </Col>
+
                                 <Col span={8}>
-                                    <p>Type</p>
-                                    <Select
-                                        style={{ width: '80%', }}
-                                        onChange={handleChangeType}
-                                        value={typeSupplier}
-                                        options={[
-                                            { value: 'alojamiento', label: 'Alojamiento' },
-                                            { value: 'transporte', label: 'Transporte' },
-                                            { value: 'gastronomico', label: 'Gastronomico' },
-                                            { value: 'agencia_viajes', label: 'Agencia de Viajes' },
-                                            { value: 'actividades', label: 'Actividades y excursiones' },
-                                            { value: 'rural', label: 'Rural y Natural' },
-                                            { value: 'evento', label: 'Eventos y Conciertos' },
-                                            { value: 'complementario', label: 'Complementarios' },
-                                        ]}
+                                    <p>Fecha de nacimiento</p>
+                                    <DatePicker
+                                        onChange={onChangeCumple}
+                                        value={birthdate}
+                                        disabled
+
                                     />
                                 </Col>
 
@@ -515,82 +419,35 @@ const Clientes = () => {
 
                             {/* 3rd ROW */}
                             <Row>
-                                <Col span={8}>
+                                <Col span={11}>
                                     <p>Status</p>
                                     <Select
                                         style={{ width: '80%', }}
                                         onChange={handleChangeStatus}
                                         value={status}
                                         options={[
-                                            { value: 'ACTIVO', label: 'Activo' },
-                                            { value: 'INACTIVO', label: 'Inactivo' },
-                                            { value: 'PAUSA', label: 'En Pausa' },
+                                            { value: 'NEW', label: 'NEW' },
+                                            { value: 'LEAD', label: 'LEAD' },
+                                            { value: 'CLIENT', label: 'CLIENT' },
                                         ]}
                                     />
                                 </Col>
 
-                                <Col span={8} >
+                                <Col span={11} >
                                     <p>Rate</p>
                                     <Rate
                                         value={rate}
                                         onChange={handleChangeRate}
                                     />
                                 </Col>
-                                <Col span={8} >
-                                    <p>Logo</p>
-                                    <UploadLogo
-                                        logoURL={''}
-                                        type={'logo'}
-
-                                    />
-                                </Col>
 
                             </Row>
 
-
-                            {/* <>
-                                {newOriginID ?
-                                    (
-                                        <Button
-                                            style={{ backgroundColor: 'coral' }}
-                                            type="primary"
-                                            htmlType="submit"
-                                            loading={loading.updateData}
-                                        >
-                                            {loading.updateData ? 'Loading...' : 'Actualizar'}
-                                        </Button>
-
-                                    ) : (
-                                        <Button
-                                            style={{ backgroundColor: 'yellowgreen' }}
-                                            type="primary"
-                                            htmlType="submit"
-                                            loading={loading.addData}
-                                        >
-                                            {loading.addData ? 'Loading...' : 'Registrar'}
-                                        </Button>
-
-                                    )
-                                }
-                            </> */}
-
-                            {/* <StripeCheckoutForm totalPrice={email} nombreEmpresa={nombreEmpresa} /> */}
-
+                            <Divider />
                         </Form>
                     </Col>
                 </Row >
             </Modal>
-
-
-
-            {/* <Divider orientation="left">Mapa de Proveedores</Divider>
-            <Row style={{ marginLeft: 100 }}>
-                <Col span={24}>
-                    {
-                        currentPosition ? <MapView currentPosition={currentPosition} data={data} /> : null
-                    }
-                </Col>
-            </Row> */}
         </>
     )
 }

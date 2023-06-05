@@ -17,7 +17,7 @@ import { useFirestore } from "../hooks/useFirestore"
 
 // importamos el componente de mapas
 import MapView from "../components/Maps/MapView"
-import TableDynamic from "../components/TableDynamic"
+import TableDynamic from "../components/Tables/TableDynamic"
 import ModalDynamic from "../components/ModalDynamic"
 import UploadLogo from "../components/UploadLogo"
 import { SupplierContext } from "../context/SupplierProvider"
