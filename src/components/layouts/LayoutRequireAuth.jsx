@@ -114,7 +114,7 @@ const LayoutRequireAuth = () => {
     return (
         <div className="contanier mx-auto">
             <Layout>
-                <Header className="header">
+                <Header className="">
                     <div className="logo" />
                     <Menu onClick={handleClickMenu} theme="dark" mode="horizontal" defaultSelectedKeys={['1']} items={items1} />
                 </Header>

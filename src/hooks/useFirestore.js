@@ -137,7 +137,7 @@ export const useFirestore = () => {
             // filtramos los resultados dependiendo el USER logeado.
             const q = query(
                 dataRef,
-                where("idUser", "==", auth.currentUser.uid)
+                // where("idUser", "==", auth.currentUser.uid)
             )
             // Obtenemos la data de firebase
             const querySnapshot = await getDocs(q)
@@ -367,7 +367,7 @@ export const useFirestore = () => {
             // filtramos los resultados dependiendo el USER logeado.
             const q = query(
                 dataRef,
-                where("idUser", "==", auth.currentUser.uid)
+                // where("idUser", "==", auth.currentUser.uid)
             )
             // Obtenemos la data de firebase
             const querySnapshot = await getDocs(q)

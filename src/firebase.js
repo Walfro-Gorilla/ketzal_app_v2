@@ -9,16 +9,14 @@ import { getStorage, ref } from "firebase/storage";
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBoUA9UzPaoXTKNXcU4rNsuUybcTRA9MjA",
-  authDomain: "mx-ketzal-app.firebaseapp.com",
-  projectId: "mx-ketzal-app",
-  storageBucket: "mx-ketzal-app.appspot.com",
-  messagingSenderId: "709820211009",
-  appId: "1:709820211009:web:5d6535c44369cc44d64bc0",
-  measurementId: "G-VYS7ZJ7D9D",
-
-  databaseURL: "https://mx-ketzal-app.firebaseio.com",
-
+  apiKey: "AIzaSyA6iGJEGPBehQw1u4TUcL3oSTXoaDr75W8",
+  authDomain: "huitziil-6a3e0.firebaseapp.com",
+  databaseURL: "https://huitziil-6a3e0.firebaseio.com",
+  projectId: "huitziil-6a3e0",
+  storageBucket: "huitziil-6a3e0.appspot.com",
+  messagingSenderId: "120958343360",
+  appId: "1:120958343360:web:9f48e505703f3066de7525",
+  measurementId: "G-51CV63CE38"
  
 };
 
